@@ -2,45 +2,41 @@
 #include <stdio.h>
 #include <math.h>
 
-#define SCREENWIDTH 800
-#define SCREENHEIGHT 800
-#define CIRCLERADIUS 50
-#define CIRCLESPEED 5
-#define DIRECTIONCIRCLERADIUS 30
+#define ScreenWidth 800
+#define ScreenHeight 800
+#define autoCircleRadius 50
+#define autoCircleSpeed 5
+#define controlCircleRadius 30
 
 bool init(SDL_Window** window, SDL_Renderer** renderer) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        printf("Initialization failed: %s\n", SDL_GetError());
+        printf("SDL Initialization Has Failed: %s\n", SDL_GetError());
         return false;
     }
 
-    *window = SDL_CreateWindow("Moving and collision of two circle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREENWIDTH, SCREENHEIGHT, SDL_WINDOW_SHOWN);
+    *window = SDL_CreateWindow("Collision of two Circle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
     if (*window == NULL) {
-        printf("Window failed: %s\n", SDL_GetError());
+        printf("Window Failed: %s\n", SDL_GetError());
         return false;
     }
 
     *renderer = SDL_CreateRenderer(*window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
     if (*renderer == NULL) {
-        printf("Renderer failed: %s\n", SDL_GetError());
+        printf("Renderer  Failed: %s\n", SDL_GetError());
         return false;
     }
-
     return true;
 }
 
-void Circle(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
-     for (int a= -radius; a <= radius; a++) {
+void Circle(SDL_Renderer* renderer, int center_X, int center_Y, int radius, SDL_Color color) {
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    for (int a = -radius; a <= radius; a++) {
         for (int b = -radius; b <= radius; b++) {
-            if (a*a + b*b <= radius*radius) {
-                SDL_RenderDrawPoint(renderer, centerX + a, centerY + b);
+            if (a * a + b * b <= radius * radius) {
+                SDL_RenderDrawPoint(renderer, center_X + a, center_Y + b);
             }
         }
     }
-}
-
-void directionCircle(SDL_Renderer* renderer, int x, int y) {
-    Circle(renderer, x, y, DIRECTIONCIRCLERADIUS);
 }
 
 bool Collision(int x1, int y1, int x2, int y2, int radius1, int radius2) {
@@ -59,13 +55,14 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    int X = -CIRCLERADIUS;
-    int Y = SCREENHEIGHT / 2;
-    int directionCircleX = SCREENWIDTH / 2;
-    int directionCircleY = 0;
-
-    bool running = true;
     SDL_Event event;
+    bool running = true;
+    int CircleX = 0;
+    int CircleY = ScreenHeight / 2;
+    int cCircleX = ScreenWidth / 2;
+    int cCircleY = 20;
+    SDL_Color CircleColor = {255, 255, 51, 255}; 
+    SDL_Color controlCircleColor = {135, 206, 250, 255};
 
     while (running) {
         while (SDL_PollEvent(&event)) {
@@ -73,46 +70,45 @@ int main(int argc, char* argv[]) {
                 running = false;
             }
             else if (event.type == SDL_KEYDOWN) {
-
                 if (event.key.keysym.sym == SDLK_UP) {
-                    directionCircleY -= 5;
-                } else if (event.key.keysym.sym == SDLK_DOWN) {
-                    directionCircleY += 5;
-                } else if (event.key.keysym.sym == SDLK_LEFT) {
-                    directionCircleX -= 5;
-                } else if (event.key.keysym.sym == SDLK_RIGHT) {
-                    directionCircleX += 5;
+                    cCircleY -= 5;
+                } 
+                else if (event.key.keysym.sym == SDLK_DOWN) {
+                    cCircleY += 5;
+                } 
+                else if (event.key.keysym.sym == SDLK_LEFT) {
+                    cCircleX -= 5;
+                } 
+                else if (event.key.keysym.sym == SDLK_RIGHT) {
+                    cCircleX += 5;
                 }
             }
         }
 
-      
-        X += CIRCLESPEED;
-        if (X > SCREENWIDTH + CIRCLERADIUS) {
-            X = -CIRCLERADIUS;
+        CircleX += autoCircleSpeed;
+        if (CircleX - autoCircleRadius > ScreenWidth) {
+            CircleX = -autoCircleRadius;
         }
 
-        SDL_SetRenderDrawColor(renderer, 0,0,0, 255);
+        if (Collision(CircleX, CircleY, cCircleX, cCircleY, autoCircleRadius, controlCircleRadius)) {
+            CircleColor = controlCircleColor = {255, 0, 0, 255}; 
+        } else {
+            CircleColor = {255, 255, 51, 255}; 
+            controlCircleColor = {135, 206, 250, 255}; 
+        }
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255); 
         SDL_RenderClear(renderer);
 
-      
-        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-        Circle(renderer, X, Y, CIRCLERADIUS);
-
-        SDL_SetRenderDrawColor(renderer,  51, 102, 255, 255);
-        directionCircle(renderer, directionCircleX, directionCircleY);
-
-       
-        if (Collision(X, Y, directionCircleX, directionCircleY, CIRCLERADIUS, DIRECTIONCIRCLERADIUS)) {
-           
-            SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-            SDL_RenderDrawLine(renderer, X - CIRCLERADIUS, Y, X + CIRCLERADIUS, Y);
-        }
+        Circle(renderer, CircleX, CircleY, autoCircleRadius, CircleColor);
+        Circle(renderer, cCircleX, cCircleY, controlCircleRadius, controlCircleColor);
 
         SDL_RenderPresent(renderer);
     }
+
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
     return 0;
 }

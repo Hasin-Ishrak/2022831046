@@ -10,7 +10,7 @@
 
 bool init(SDL_Window** window, SDL_Renderer** renderer) {
     if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-        printf("SDL Initialization Has Failed: %s\n", SDL_GetError());
+        printf("Initialization Failed: %s\n", SDL_GetError());
         return false;
     }
 

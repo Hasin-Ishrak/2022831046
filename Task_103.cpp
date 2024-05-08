@@ -14,7 +14,7 @@ bool init(SDL_Window** window, SDL_Renderer** renderer) {
         return false;
     }
 
-    *window = SDL_CreateWindow("Collision of two Circle", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
+    *window = SDL_CreateWindow("Task_103", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, ScreenWidth, ScreenHeight, SDL_WINDOW_SHOWN);
     if (*window == NULL) {
         printf("Window Failed: %s\n", SDL_GetError());
         return false;

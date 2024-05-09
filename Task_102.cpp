@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 
         SDL_RenderPresent(renderer);
 
-        Radius += 7;
+        Radius += 10;
 
         if (X + Radius >= SCREENWIDTH || Y + Radius >= SCREENHEIGHT) {
           

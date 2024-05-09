@@ -71,16 +71,16 @@ int main(int argc, char* argv[]) {
             }
             else if (event.type == SDL_KEYDOWN) {
                 if (event.key.keysym.sym == SDLK_UP) {
-                    cCircleY -= 5;
+                    cCircleY -= 10;
                 } 
                 else if (event.key.keysym.sym == SDLK_DOWN) {
-                    cCircleY += 5;
+                    cCircleY += 10;
                 } 
                 else if (event.key.keysym.sym == SDLK_LEFT) {
-                    cCircleX -= 5;
+                    cCircleX -= 10;
                 } 
                 else if (event.key.keysym.sym == SDLK_RIGHT) {
-                    cCircleX += 5;
+                    cCircleX += 10;
                 }
             }
         }
